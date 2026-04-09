@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { SiteHeader } from "@/components/navigation/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -79,7 +80,10 @@ export default function NewProjectPage() {
   }
 
   return (
-    <div className="grid gap-6">
+    <>
+      <SiteHeader />
+      <main className="mx-auto max-w-[1400px] px-6 py-8">
+        <div className="grid gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Добавить проект</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -162,5 +166,7 @@ export default function NewProjectPage() {
         </div>
       </form>
     </div>
+    </main>
+    </>
   );
 }
