@@ -14,7 +14,7 @@ export default function SiteLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-dvh">
+    <div className="min-h-dvh bg-background text-foreground antialiased">
       <header className="sticky top-0 z-50 border-b bg-background/70 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between px-6">
           <Link href="/vacancies" className="font-semibold tracking-tight">
