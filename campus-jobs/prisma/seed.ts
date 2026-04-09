@@ -4,6 +4,12 @@ const prisma = new PrismaClient()
 
 async function main() {
   // Очистка данных
+  await prisma.eventRegistration.deleteMany()
+  await prisma.bookmark.deleteMany()
+  await prisma.review.deleteMany()
+  await prisma.event.deleteMany()
+  await prisma.skill.deleteMany()
+  await prisma.company.deleteMany()
   await prisma.message.deleteMany()
   await prisma.application.deleteMany()
   await prisma.notification.deleteMany()
@@ -159,6 +165,131 @@ async function main() {
       userId: student.id,
     },
   })
+
+  // Создание навыков
+  await prisma.skill.createMany({
+    data: [
+      { name: "JavaScript", category: "Разработка" },
+      { name: "Python", category: "Разработка" },
+      { name: "SQL", category: "Данные" },
+      { name: "Excel", category: "Данные" },
+      { name: "Коммуникация", category: "Мягкие навыки" },
+      { name: "Организация", category: "Мягкие навыки" },
+      { name: "Power BI", category: "Данные" },
+      { name: "TypeScript", category: "Разработка" },
+      { name: "React", category: "Разработка" },
+      { name: "Git", category: "Разработка" },
+    ],
+  })
+
+  // Создание компаний
+  const company1 = await prisma.company.create({
+    data: {
+      name: "Яндекс",
+      description: "Технологическая компания",
+      logo: null,
+      website: "https://yandex.ru",
+      industry: "IT",
+    },
+  })
+
+  const company2 = await prisma.company.create({
+    data: {
+      name: "Сбер",
+      description: "Финансовая компания",
+      logo: null,
+      website: "https://sber.ru",
+      industry: "Финансы",
+    },
+  })
+
+  // Обновление вакансий с привязкой к компаниям
+  const allVacancies = await prisma.vacancy.findMany()
+  if (allVacancies.length > 0) {
+    await prisma.vacancy.update({
+      where: { id: allVacancies[0].id },
+      data: { companyId: company1.id },
+    })
+    if (allVacancies.length > 1) {
+      await prisma.vacancy.update({
+        where: { id: allVacancies[1].id },
+        data: { companyId: company2.id },
+      })
+    }
+  }
+
+  // Создание мероприятий
+  await prisma.event.createMany({
+    data: [
+      {
+        title: "Ярмарка вакансий 2024",
+        description: "Встреча с работодателями кампуса",
+        date: new Date("2024-04-15T10:00:00"),
+        location: "Главный корпус, актовый зал",
+        type: "CAREER_FAIR",
+        status: "UPCOMING",
+        companyId: company1.id,
+      },
+      {
+        title: "Вебинар: Карьера в IT",
+        description: "Онлайн-встреча с экспертами",
+        date: new Date("2024-04-20T14:00:00"),
+        location: "Zoom",
+        type: "WEBINAR",
+        status: "UPCOMING",
+        companyId: company2.id,
+      },
+      {
+        title: "Мастер-класс: Резюме и собеседование",
+        description: "Практические советы для студентов",
+        date: new Date("2024-03-25T16:00:00"),
+        location: "Корпус B, 101",
+        type: "WORKSHOP",
+        status: "COMPLETED",
+      },
+    ],
+  })
+
+  // Создание отзывов
+  await prisma.review.createMany({
+    data: [
+      {
+        rating: 5,
+        comment: "Отличная компания для старта карьеры",
+        userId: student.id,
+        companyId: company1.id,
+      },
+      {
+        rating: 4,
+        comment: "Хорошие условия, но много бюрократии",
+        userId: student.id,
+        companyId: company2.id,
+      },
+    ],
+  })
+
+  // Создание закладок
+  const firstVacancy = await prisma.vacancy.findFirst()
+  if (firstVacancy) {
+    await prisma.bookmark.create({
+      data: {
+        userId: student.id,
+        vacancyId: firstVacancy.id,
+      },
+    })
+  }
+
+  // Создание регистраций на мероприятия
+  const firstEvent = await prisma.event.findFirst()
+  if (firstEvent) {
+    await prisma.eventRegistration.create({
+      data: {
+        userId: student.id,
+        eventId: firstEvent.id,
+        status: "REGISTERED",
+      },
+    })
+  }
 
   console.log("✅ Seed data created successfully!")
 }

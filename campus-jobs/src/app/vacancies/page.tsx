@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { SiteHeader } from "@/components/navigation/SiteHeader";
+import { Bookmark } from "lucide-react";
 
 interface Vacancy {
   id: string;
@@ -48,6 +49,62 @@ export default function VacanciesPage() {
   const [loading, setLoading] = React.useState(true);
   const [query, setQuery] = React.useState("");
   const [type, setType] = React.useState<TypeFilter>("all");
+  const [bookmarks, setBookmarks] = React.useState<Set<string>>(new Set());
+  const [userId, setUserId] = React.useState<string>("");
+
+  React.useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await fetch("/api/me");
+        if (res.ok) {
+          const user = await res.json();
+          setUserId(user.id);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    }
+    fetchUser();
+  }, []);
+
+  React.useEffect(() => {
+    if (!userId) return;
+    async function fetchBookmarks() {
+      try {
+        const res = await fetch(`/api/bookmarks?userId=${userId}`);
+        if (res.ok) {
+          const data = await res.json();
+          const vacancyIds = new Set(data.map((b: any) => b.vacancyId) as string[]);
+          setBookmarks(vacancyIds);
+        }
+      } catch (error) {
+        console.error("Error fetching bookmarks:", error);
+      }
+    }
+    fetchBookmarks();
+  }, [userId]);
+
+  async function handleBookmark(vacancyId: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    try {
+      if (bookmarks.has(vacancyId)) {
+        await fetch(`/api/bookmarks?userId=${userId}&vacancyId=${vacancyId}`, {
+          method: "DELETE",
+        });
+        setBookmarks(new Set([...bookmarks].filter((id) => id !== vacancyId)));
+      } else {
+        await fetch("/api/bookmarks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, vacancyId }),
+        });
+        setBookmarks(new Set([...bookmarks, vacancyId]));
+      }
+    } catch (error) {
+      console.error("Error handling bookmark:", error);
+    }
+  }
+
   const [format, setFormat] = React.useState<FormatFilter>("all");
   const [department, setDepartment] = React.useState<string>("all");
   const [selectedId, setSelectedId] = React.useState("");
@@ -299,8 +356,13 @@ export default function VacanciesPage() {
 
                     {density === "comfortable" ? (
                       <div className="mt-4 flex gap-2">
-                        <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
-                          Сохранить
+                        <Button
+                          variant={bookmarks.has(v.id) ? "default" : "outline"}
+                          size="sm"
+                          onClick={(e) => handleBookmark(v.id, e)}
+                        >
+                          <Bookmark className={`h-4 w-4 mr-2 ${bookmarks.has(v.id) ? "fill-current" : ""}`} />
+                          {bookmarks.has(v.id) ? "Сохранено" : "Сохранить"}
                         </Button>
                         <Button size="sm" asChild onClick={(e) => e.stopPropagation()}>
                           <Link href={`/vacancies/${v.id}/apply`}>Откликнуться</Link>

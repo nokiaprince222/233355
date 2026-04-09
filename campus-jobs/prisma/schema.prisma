@@ -13,17 +13,20 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  name          String
-  email         String    @unique
-  role          Role      @default(STUDENT)
-  faculty       String?
-  course        Int?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  applications  Application[]
-  notifications Notification[]
-  portfolio     Portfolio[]
+  id                  String              @id @default(uuid())
+  name                String
+  email               String              @unique
+  role                Role                @default(STUDENT)
+  faculty             String?
+  course              Int?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  applications        Application[]
+  notifications       Notification[]
+  portfolio           Portfolio[]
+  reviews             Review[]
+  bookmarks           Bookmark[]
+  eventRegistrations  EventRegistration[]
   @@map("users")
 }
 
@@ -44,7 +47,10 @@ model Vacancy {
   status          VacancyStatus @default(ACTIVE)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  companyId       String?
+  company         Company? @relation(fields: [companyId], references: [id])
   applications    Application[]
+  bookmarks       Bookmark[]
   @@map("vacancies")
 }
 
@@ -99,6 +105,81 @@ model Portfolio {
   @@map("portfolios")
 }
 
+model Skill {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  category    String?
+  createdAt   DateTime @default(now())
+  @@map("skills")
+}
+
+model Company {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  logo        String?
+  website     String?
+  industry    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  vacancies   Vacancy[]
+  events      Event[]
+  reviews     Review[]
+  @@map("companies")
+}
+
+model Event {
+  id                  String   @id @default(uuid())
+  title               String
+  description         String?
+  date                DateTime
+  location            String?
+  type                EventType @default(CAREER_FAIR)
+  status              EventStatus @default(UPCOMING)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  companyId           String?
+  company             Company? @relation(fields: [companyId], references: [id])
+  eventRegistrations  EventRegistration[]
+  @@map("events")
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  rating      Int
+  comment     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  companyId   String
+  user        User     @relation(fields: [userId], references: [id])
+  company     Company  @relation(fields: [companyId], references: [id])
+  @@map("reviews")
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  userId    String
+  vacancyId String
+  user      User     @relation(fields: [userId], references: [id])
+  vacancy   Vacancy  @relation(fields: [vacancyId], references: [id])
+  @@unique([userId, vacancyId])
+  @@map("bookmarks")
+}
+
+model EventRegistration {
+  id        String   @id @default(uuid())
+  status    RegistrationStatus @default(REGISTERED)
+  createdAt DateTime @default(now())
+  userId    String
+  eventId   String
+  user      User     @relation(fields: [userId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id])
+  @@unique([userId, eventId])
+  @@map("event_registrations")
+}
+
 enum Role {
   STUDENT
   EMPLOYER
@@ -134,4 +215,25 @@ enum Visibility {
   PRIVATE
   CAMPUS
   PUBLIC
+}
+
+enum EventType {
+  CAREER_FAIR
+  WEBINAR
+  WORKSHOP
+  MEETUP
+  INTERNSHIP
+}
+
+enum EventStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  ATTENDED
+  CANCELLED
 }

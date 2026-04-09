@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileText, Settings, Search, Bell, Briefcase, Building2, ArrowRight } from "lucide-react";
+import { FileText, Settings, Search, Bell, Briefcase, Building2, ArrowRight, CalendarDays, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -129,6 +129,58 @@ export default function HomePage() {
                 <Link href="/admin/vacancies">
                   <ArrowRight className="mr-2 size-4" />
                   Админка
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <CalendarDays className="size-5" />
+              Мероприятия
+            </CardTitle>
+            <CardDescription>
+              Карьерные ярмарки, вебинары и мастер-классы
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <CardDescription>
+              Участвуйте в мероприятиях кампуса, встречайтесь с работодателями и развивайте навыки.
+            </CardDescription>
+            <div className="flex gap-2">
+              <Button variant="outline" asChild>
+                <Link href="/events">
+                  <ArrowRight className="mr-2 size-4" />
+                  Мероприятия
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Star className="size-5" />
+              Компании
+            </CardTitle>
+            <CardDescription>
+              Работодатели и организации-партнёры
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <CardDescription>
+              Изучайте компании, читайте отзывы и находите идеального работодателя.
+            </CardDescription>
+            <div className="flex gap-2">
+              <Button variant="outline" asChild>
+                <Link href="/companies">
+                  <ArrowRight className="mr-2 size-4" />
+                  Компании
                 </Link>
               </Button>
             </div>
