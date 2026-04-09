@@ -17,7 +17,7 @@ export function AdminNav() {
   React.useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await fetch("/api/auth/me");
+        const res = await fetch("/api/me");
         if (res.ok) {
           const data = await res.json();
           setUser(data);

@@ -102,30 +102,30 @@ export default function BookmarksPage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {bookmarks.map((bookmark) => (
                 <Card key={bookmark.id}>
                   <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
                         <Link href={`/vacancies/${bookmark.vacancy.id}`}>
-                          <h3 className="font-medium hover:text-primary transition-colors">
+                          <h3 className="font-medium hover:text-primary transition-colors line-clamp-1">
                             {bookmark.vacancy.title}
                           </h3>
                         </Link>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
                           {bookmark.vacancy.department}
                         </p>
-                        <div className="flex items-center gap-4 mt-3 text-sm">
+                        <div className="flex flex-wrap items-center gap-2 mt-3 text-sm">
                           <Badge variant="outline">{bookmark.vacancy.format}</Badge>
                           <span className="text-muted-foreground">{bookmark.vacancy.pay}</span>
-                          <span className="text-muted-foreground">{bookmark.vacancy.deadline}</span>
                         </div>
                       </div>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => handleRemoveBookmark(bookmark.vacancy.id)}
+                        className="shrink-0"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
